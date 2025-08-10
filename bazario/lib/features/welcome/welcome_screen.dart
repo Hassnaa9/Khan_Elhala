@@ -1,6 +1,9 @@
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
+import 'package:bazario/utils/constants/texts.dart';
 import 'package:flutter/material.dart';
+
+import '../onboarding/onboarding.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -70,7 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                     fontSize: 36,
                     color: MyColors.kPrimaryColor
                 ),),
-              Text("Discover elegance and modesty with our exclusive collection of hijabs, abayas, and modest wear for Muslim women.",
+              Text(TextStrings.welcomeTitle,
                 textAlign: TextAlign.center
               ,style: TextStyle(
                     fontFamily: "Galindo",
@@ -81,7 +84,10 @@ class WelcomeScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => OnboardingScreen()),
+              );
             },
             style: ElevatedButton.styleFrom(
               elevation: 0,
