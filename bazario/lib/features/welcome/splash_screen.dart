@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'welcome_screen.dart';
 
+import 'package:bazario/features/welcome/welcome_screen.dart';
+import 'package:bazario/utils/constants/image_strings.dart';
+import 'package:flutter/material.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -11,31 +12,20 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    Timer(const Duration(seconds: 4), () {
+    // Wait for 3 seconds, then navigate
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
       );
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF488ccb),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/logo.png', // حط لوجو Bazario هنا
-              height: 800,
-            ),
-          ],
-        ),
-      ),
+      body: Image.asset(ImagesUrl.splash_screen,fit: BoxFit.fill,),
     );
   }
 }

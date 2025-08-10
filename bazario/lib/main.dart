@@ -18,8 +18,9 @@
 //     );
 //   }
 // }
-import 'package:bazario/features/splash&welcome/splash_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'features/welcome/splash_screen.dart';
 
 void main() {
   runApp(const BazarioApp());
