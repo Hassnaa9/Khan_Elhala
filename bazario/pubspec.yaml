@@ -29,8 +29,10 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   auto_route: ^10.1.0+1
+  cloud_firestore: ^6.0.0
   cupertino_icons: ^1.0.8
   device_preview: ^1.2.0
+  firebase_auth: ^6.0.1
   flutter:
     sdk: flutter
   flutter_auto_size_text: ^4.1.0
