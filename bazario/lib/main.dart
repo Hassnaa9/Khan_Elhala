@@ -1,44 +1,35 @@
-// import 'package:flutter/material.dart';
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Demo',
-//       theme: ThemeData(
-//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-//         useMaterial3: true,
-//       ),
-//     );
-//   }
-// }
+// dart format width=80
 import 'package:flutter/material.dart';
-
-import 'features/welcome/splash_screen.dart';
+import 'package:provider/provider.dart'; // Import the provider package
+import 'package:bazario/app/app_router.dart';
+import 'data/repositories/home_provider.dart'; // Make sure this is the correct path to your HomeProvider
 
 void main() {
-  runApp(const BazarioApp());
+  runApp(BazarioApp());
 }
 
 class BazarioApp extends StatelessWidget {
-  const BazarioApp({super.key});
+  BazarioApp({super.key});
+
+  final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Bazario',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Roboto',
+    // Wrap the entire app with MultiProvider to make the HomeProvider
+    // accessible throughout the entire app's widget tree.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+      ],
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'Bazario',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          fontFamily: 'Roboto',
+        ),
+        routerConfig: _appRouter.config(), // Provide the router configuration
       ),
-      home: const SplashScreen(),
     );
   }
 }
