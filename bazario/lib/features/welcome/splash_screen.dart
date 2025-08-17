@@ -14,19 +14,62 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _glowAnimation;
+
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 5), () {
-      context.router.replace(const WelcomeRoute());
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    // Animate the text from the bottom to the center
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1.5), // Start from below the screen
+      end: Offset.zero, // End at the center
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    // Animate the glow effect
+    _glowAnimation = Tween<double>(
+      begin: 0.0,
+      end: 10.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // Start the animation and navigate after it's complete
+    _controller.forward().then((_) {
+      Timer(const Duration(seconds: 4), () {
+        context.router.replace(const WelcomeRoute());
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        toolbarHeight: 0, // Hides the app bar
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -34,24 +77,30 @@ class _SplashScreenState extends State<SplashScreen> {
             ImagesUrl.splashScreen,
             fit: BoxFit.fill,
           ),
-          Positioned(
-            bottom: MediaQuery.of(context).size.height / 4,
-            left: MediaQuery.of(context).size.width / 4,
-            child: Text(
-              'خَان الحَلا',
-              style: TextStyle(
-                fontFamily: 'Khotam',
-                fontSize: 80,
-                fontWeight: FontWeight.bold,
-                color: Colors.brown.shade800,
-                shadows: [
-                  Shadow(
-                    blurRadius: 5.0,
-                    color: Colors.black.withOpacity(0.3),
-                    offset: const Offset(2.0, 2.0),
+          Center(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: _slideAnimation.value * 200, // Multiplier for distance
+                  child: Text(
+                    'خَان الحَلا',
+                    style: TextStyle(
+                      fontFamily: 'Khotam',
+                      fontSize: 90,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: _glowAnimation.value,
+                          color: Colors.white,
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
