@@ -1,10 +1,12 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 import 'package:bazario/utils/constants/texts.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/app_router.gr.dart';
 import '../onboarding/onboarding.dart';
-
+@RoutePage()
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -84,10 +86,7 @@ class WelcomeScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => OnboardingScreen()),
-              );
+              context.router.push(const OnboardingRoute());
             },
             style: ElevatedButton.styleFrom(
               elevation: 0,
@@ -109,10 +108,13 @@ class WelcomeScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.black,
                     fontFamily: "Urbanist",
                     fontSize: 16),),
-              Text("signin",
-                style:  TextStyle(color: MyColors.kPrimaryColor,
-                    fontFamily: "Urbanist",
-                    fontSize: 16),)
+              TextButton(
+                onPressed: ()=> context.router.replace(SignInRoute()),
+                child: Text("Sign in",
+                  style:  TextStyle(color: MyColors.kPrimaryColor,
+                      fontFamily: "Urbanist",
+                      fontSize: 16),),
+              )
             ],
           )
         ],
