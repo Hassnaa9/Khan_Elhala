@@ -1,3 +1,6 @@
+import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:bazario/app/app_router.gr.dart';
 import 'package:bazario/features/onboarding/controllers/onboarding_controller.dart';
 import 'package:bazario/features/onboarding/widgets/onboarding_dot_nav.dart';
 import 'package:bazario/features/onboarding/widgets/onboarding_page.dart';
@@ -9,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../authentication/screens/signUp_screen.dart'; // Make sure this is the correct path
-
+@RoutePage()
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
@@ -69,10 +72,7 @@ class OnboardingScreen extends StatelessWidget {
                 onPressed: () {
                   // The action is correctly triggered here
                   if (controller.currentPageIndex.value == 2) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SignUpScreen()),
-                    );
+                    context.router.replace(SignUpRoute());
                   } else {
                     OnboardingController.instance.nextPage();
                   }

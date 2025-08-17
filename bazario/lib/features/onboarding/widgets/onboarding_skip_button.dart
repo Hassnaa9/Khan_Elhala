@@ -1,8 +1,9 @@
-import 'package:bazario/features/authentication/screens/signUp_screen.dart';
-import 'package:bazario/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:bazario/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
+
+import '../../../app/app_router.gr.dart';
 
 class OnboardingSkipButton extends StatelessWidget {
   const OnboardingSkipButton({super.key});
@@ -14,10 +15,8 @@ class OnboardingSkipButton extends StatelessWidget {
       right: Sizes.defaultSpace - 10,
       child: TextButton(
         onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => SignUpScreen()),
-          );
+          context.router.replace(SignUpRoute());
+
         },
         style: TextButton.styleFrom(
           // Set the background color and shape here
