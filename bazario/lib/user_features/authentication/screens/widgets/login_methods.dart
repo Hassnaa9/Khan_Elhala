@@ -1,4 +1,4 @@
-import 'package:bazario/features/authentication/screens/widgets/social_signin_button.dart';
+import 'package:bazario/user_features/authentication/screens/widgets/social_signin_button.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 import 'package:flutter/material.dart';
 

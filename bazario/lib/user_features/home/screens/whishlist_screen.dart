@@ -2,7 +2,7 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bazario/features/home/screens/widgets/product_cart.dart';
+import 'package:bazario/user_features/home/screens/widgets/product_cart.dart';
 import 'package:bazario/utils/constants/colors.dart';
 
 import '../../../data/repositories/home_provider.dart';

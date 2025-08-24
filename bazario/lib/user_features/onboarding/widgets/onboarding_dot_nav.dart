@@ -1,4 +1,4 @@
-import 'package:bazario/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:bazario/user_features/onboarding/controllers/onboarding_controller.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

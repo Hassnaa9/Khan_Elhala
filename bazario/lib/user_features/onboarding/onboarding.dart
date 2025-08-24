@@ -1,10 +1,10 @@
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:bazario/app/app_router.gr.dart';
-import 'package:bazario/features/onboarding/controllers/onboarding_controller.dart';
-import 'package:bazario/features/onboarding/widgets/onboarding_dot_nav.dart';
-import 'package:bazario/features/onboarding/widgets/onboarding_page.dart';
-import 'package:bazario/features/onboarding/widgets/onboarding_skip_button.dart';
+import 'package:bazario/user_features/onboarding/controllers/onboarding_controller.dart';
+import 'package:bazario/user_features/onboarding/widgets/onboarding_dot_nav.dart';
+import 'package:bazario/user_features/onboarding/widgets/onboarding_page.dart';
+import 'package:bazario/user_features/onboarding/widgets/onboarding_skip_button.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 import 'package:bazario/utils/constants/sizes.dart';

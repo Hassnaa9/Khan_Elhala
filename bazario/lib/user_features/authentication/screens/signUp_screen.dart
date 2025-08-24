@@ -1,41 +1,108 @@
+// dart format width=80
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:bazario/features/authentication/screens/signUp_screen.dart';
-import 'package:bazario/features/authentication/screens/widgets/login_methods.dart';
+import 'package:bazario/app/app_router.gr.dart';
+import 'package:bazario/user_features/authentication/screens/signIn_screen.dart';
+import 'package:bazario/user_features/authentication/screens/widgets/login_methods.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
-import '../../../app/app_router.gr.dart';
 import '../../../utils/constants/colors.dart';
+
 @RoutePage()
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _RegisterBodyState();
+  State<SignUpScreen> createState() => _RegisterBodyState();
 }
 
-class _RegisterBodyState extends State<SignInScreen> {
+class _RegisterBodyState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+  TextEditingController();
 
   bool _isPasswordVisible = false;
+  bool _isLoading = false; // Add a state variable for loading
 
   @override
   void dispose() {
+    _userNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  // A helper method to handle form submission
-  void _submitForm() {
+  // A helper method to handle form submission and Firebase registration
+  void _submitForm() async {
+    // First, validate the form fields
     if (_formKey.currentState!.validate()) {
-      // Form is valid, proceed with registration logic
-      print('Form is valid. User data:');
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
-      // Here you would typically call a service to handle the registration
+      // Set loading state to true and disable the button
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Use Firebase Auth to create a new user with email and password
+        final UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Get the user's unique ID (UID) from the UserCredential
+        final user = userCredential.user;
+        if (user != null) {
+          // Store additional user data (like username) in Firestore.
+          // The document ID is set to the user's UID for easy lookup.
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+            'username': _userNameController.text.trim(),
+            'email': _emailController.text.trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          print('User data stored in Firestore successfully!'); // Debugging line
+        }
+
+        // After successful registration and data storage, navigate.
+        context.router.replace(const HomeRoute());
+      } on FirebaseAuthException catch (e) {
+        // Handle Firebase-specific errors and show a user-friendly message
+        String message;
+        if (e.code == 'weak-password') {
+          message = 'The password provided is too weak.';
+        } else if (e.code == 'email-already-in-use') {
+          message = 'An account already exists for that email.';
+        } else {
+          message = 'An error occurred: ${e.message}';
+        }
+
+        // Display the error message in a SnackBar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+      } catch (e) {
+        // Catch any other potential errors during Firestore operations
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save user data: $e'),
+          ),
+        );
+      } finally {
+        // Reset the loading state regardless of the outcome
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -54,7 +121,7 @@ class _RegisterBodyState extends State<SignInScreen> {
               children: [
                 SizedBox(height: screenHeight * 0.08),
                 Text(
-                  "Welcome back! You have been missed!", // Corrected text
+                  "Fill your information below, or register with your social account",
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.normal,
@@ -62,26 +129,19 @@ class _RegisterBodyState extends State<SignInScreen> {
                       color: MyColors.kPrimaryColor),
                 ),
                 SizedBox(height: screenHeight * 0.04),
+                _buildTextField(_userNameController, "Enter your name"),
                 _buildTextField(_emailController, "Enter your email",
                     keyboardType: TextInputType.emailAddress,
                     validator: _emailValidator),
                 _buildPasswordField(_passwordController, "Enter your password"),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            "Forgot password?",
-                            style: TextStyle(color: Color(0xff6A707C),fontSize: 14,fontFamily: "Urbanist"),
-                          ))
-                    ]),
-                SizedBox(height: screenHeight * 0.04),
+                _buildPasswordField(
+                    _confirmPasswordController, "Confirm your password",
+                    confirm: true),
+                SizedBox(height: screenHeight * 0.02),
                 ElevatedButton(
-                  onPressed: (){
-                    _submitForm();
-                    context.router.replace(HomeRoute());
-                  } ,// Calls the new submit method
+                  onPressed: _isLoading
+                      ? null
+                      : _submitForm, // Disable button while loading
                   style: ElevatedButton.styleFrom(
                     backgroundColor: MyColors.kPrimaryColor,
                     foregroundColor: Colors.white,
@@ -89,30 +149,32 @@ class _RegisterBodyState extends State<SignInScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text("Sign In"),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                      : const Text("Sign Up"),
                 ),
-                // SizedBox(height: screenHeight * 0.01),
+                SizedBox(height: screenHeight * 0.02),
                 const Divider(thickness: 1),
                 const SizedBox(height: 5),
-                const Text("Or Sign in with",
+                const Text("Or Sign Up with",
                     style: TextStyle(color: Colors.grey)),
                 const Divider(thickness: 1),
                 SizedBox(height: screenHeight * 0.02),
-                login_methods(
-                    screenWidth: screenWidth, screenHeight: screenHeight),
-                SizedBox(height: screenHeight*.0999,),
+                login_methods(screenWidth: screenWidth, screenHeight: screenHeight),
                 TextButton(
-                  onPressed: () =>context.router.replace(SignUpRoute()),
+                  onPressed: () => context.router.replace(SignInRoute()),
                   child: RichText(
                     text: const TextSpan(
-                      text: "Don't have an account? ",
+                      text: "Already have an account? ",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 15,
                           fontFamily: "Urbanist"),
                       children: [
                         TextSpan(
-                            text: "Sign Up",
+                            text: "Sign in",
                             style: TextStyle(color: MyColors.kPrimaryColor)),
                       ],
                     ),
@@ -142,7 +204,7 @@ class _RegisterBodyState extends State<SignInScreen> {
         ),
         keyboardType: keyboardType,
         validator: validator ??
-            (value) {
+                (value) {
               return value == null || value.isEmpty
                   ? "This field is required."
                   : null;

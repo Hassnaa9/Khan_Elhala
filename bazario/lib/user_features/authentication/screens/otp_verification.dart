@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:auto_route/annotations.dart';
-import 'package:bazario/features/authentication/screens/widgets/logo_with_title.dart';
-import 'package:bazario/features/authentication/screens/widgets/otp_form.dart';
+import 'package:bazario/user_features/authentication/screens/widgets/logo_with_title.dart';
+import 'package:bazario/user_features/authentication/screens/widgets/otp_form.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/constants/colors.dart';

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 
-import '../../features/home/models/category.dart';
-import '../../features/home/models/product.dart';
+import '../../user_features/home/models/category.dart';
+import '../../user_features/home/models/product.dart';
 
 // Placeholder model for a cart item
 class CartItem {
