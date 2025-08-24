@@ -65,8 +65,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Product'),
-        backgroundColor: Colors.red,
+        title: const Text('Add New Product',style: TextStyle(
+        color: Colors.white,
+            fontFamily: "Urbanist",
+            fontSize: 24
+        )),
+        backgroundColor: MyColors.kPrimaryColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

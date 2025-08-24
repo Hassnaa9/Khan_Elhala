@@ -1,5 +1,6 @@
 // dart format width=80
 import 'package:auto_route/annotations.dart';
+import 'package:bazario/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -58,8 +59,12 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Products'),
-        backgroundColor: Colors.red,
+        title: const Text('Manage Products',style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Urbanist",
+            fontSize: 24
+        )),
+        backgroundColor: MyColors.kPrimaryColor,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _productsStream,
@@ -73,7 +78,11 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
           }
 
           if (snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No products found.'));
+            return const Center(child: Text('No products found.',style: TextStyle(
+                color: MyColors.kPrimaryColor,
+                fontFamily: "Urbanist",
+                fontSize: 24
+            )));
           }
 
           return ListView.builder(
@@ -84,6 +93,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
               final productId = productDoc.id;
 
               return Card(
+                color: Colors.white,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: productData['imageUrl'] != null
