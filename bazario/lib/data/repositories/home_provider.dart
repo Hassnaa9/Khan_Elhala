@@ -38,7 +38,7 @@ class HomeProvider with ChangeNotifier {
   final List<String> _wishlistFilters = [
     'All',
     'Jacket',
-    'Dress',
+    'Shirt',
     'Pant',
     'T-Shirt'
   ];
@@ -46,6 +46,7 @@ class HomeProvider with ChangeNotifier {
   List<Product> _products = [];
   int _selectedFilterIndex = 0;
   int _selectedWishlistFilterIndex = 0;
+  String _searchQuery = '';
 
   // Getters
   List<String> get flashSaleFilters => _flashSaleFilters;
@@ -60,17 +61,29 @@ class HomeProvider with ChangeNotifier {
   List<CartItem> get cartItems => _cartItems;
 
   List<Product> get filteredProducts {
+    List<Product> tempProducts = List.from(_products);
+
+    // Apply search filter first
+    if (_searchQuery.isNotEmpty) {
+      tempProducts = tempProducts
+          .where((product) =>
+          product.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    // Then apply category filter
     final selectedFilter = _flashSaleFilters[_selectedFilterIndex];
     if (selectedFilter == 'All') {
-      return _products;
+      return tempProducts;
     } else if (selectedFilter == 'Newest') {
-      final sortedProducts = List<Product>.from(_products);
-      sortedProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return sortedProducts;
+      tempProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return tempProducts;
     } else if (selectedFilter == 'Popular') {
-      return _products;
+      return tempProducts; // Assuming popularity is a field or logic is applied elsewhere
     } else {
-      return _products.where((p) => p.flashSaleType == selectedFilter).toList();
+      return tempProducts
+          .where((p) => p.flashSaleType == selectedFilter)
+          .toList();
     }
   }
 
@@ -111,6 +124,11 @@ class HomeProvider with ChangeNotifier {
       _products[productIndex].isFavorite = !_products[productIndex].isFavorite;
       notifyListeners();
     }
+  }
+
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
   }
 
   // Modified method to add a product to the cart with size and color

@@ -116,10 +116,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
-        title: const CustomSearchBar(),
-      ),
+        title: CustomSearchBar(
+          onChanged: (value) {
+            // Get the provider without listening to avoid unnecessary rebuilds
+            final homeProvider =
+            Provider.of<HomeProvider>(context, listen: false);
+            // Update the search query in the provider
+            homeProvider.updateSearchQuery(value);
+          },
+        ),      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
