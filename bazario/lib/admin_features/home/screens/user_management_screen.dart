@@ -54,7 +54,7 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> {
         stream: _usersStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Something went wrong: ${snapshot.error}'));
+            return Center(child: Text('Something went wrong'));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {

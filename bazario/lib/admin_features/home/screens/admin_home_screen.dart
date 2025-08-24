@@ -3,6 +3,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:bazario/admin_features/home/screens/widgets/build_admin_card.dart';
 import 'package:bazario/utils/constants/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bazario/app/app_router.gr.dart';
 
@@ -23,8 +24,36 @@ class AdminHomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              // TODO: Implement logout functionality here
+            onPressed: () async {
+              try {
+                // Call the signOut() method to log the user out
+                await FirebaseAuth.instance.signOut();
+
+                // Navigate the user to the login screen or another appropriate screen
+                // after successful logout.
+                // Replace '/login' with the route name of your login screen.
+                // This is just an example, you might have a different navigation setup.
+                // For instance, you could use a push replacement to prevent the user from
+                // going back to the previous screen.
+                context.router.push(SignInRoute());
+                // Optional: Show a message to the user confirming they have logged out.
+                // You can use a SnackBar for this.
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Logged out successfully!'),
+                  ),
+                );
+              } catch (e) {
+                // Handle any potential errors that might occur during the logout process.
+                print('Error during logout: $e');
+
+                // Optional: Show an error message to the user.
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to log out'),
+                  ),
+                );
+              }
             },
           ),
         ],
