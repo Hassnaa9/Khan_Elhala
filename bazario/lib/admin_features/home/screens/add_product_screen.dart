@@ -1,7 +1,10 @@
 // dart format width=80
+import 'dart:io';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../data/services/image_upload_service.dart';
 import '../../../utils/constants/colors.dart';
 
 @RoutePage()
@@ -18,6 +21,26 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   bool _isLoading = false;
+  XFile? _pickedImage;
+  String? _selectedCategory;
+  String? _selectedFlashSaleType;
+
+  final List<String> _categories = [
+    'T-Shirt',
+    'Pant',
+    'Dress',
+    'Jacket',
+    'Electronics',
+    'Books',
+  ];
+
+  final List<String> _flashSaleFilters = [
+    'All',
+    'Newest',
+    'Popular',
+    'Man',
+    'Woman',
+  ];
 
   @override
   void dispose() {
@@ -27,24 +50,48 @@ class _AddProductScreenState extends State<AddProductScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _pickedImage = image;
+      });
+    }
+  }
+
   Future<void> _addProduct() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() &&
+        _selectedCategory != null &&
+        _selectedFlashSaleType != null) {
+      if (_pickedImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select an image.')),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
+
       try {
-        // We are now using a placeholder image URL instead of Firebase Storage.
-        // This is a temporary solution since a credit card is required.
-        const String placeholderImageUrl =
-            "https://via.placeholder.com/150";
+        final imageUrl = await uploadImageToCloudinary(File(_pickedImage!.path));
+
+        if (imageUrl == null) {
+          throw Exception('Failed to get image URL from Cloudinary.');
+        }
 
         await FirebaseFirestore.instance.collection('products').add({
           'name': _nameController.text.trim(),
           'description': _descriptionController.text.trim(),
           'price': double.tryParse(_priceController.text) ?? 0.0,
-          'imageUrl': placeholderImageUrl,
+          'imageUrl': imageUrl,
+          'category': _selectedCategory,
+          'flashSaleType': _selectedFlashSaleType,
           'createdAt': FieldValue.serverTimestamp(),
         });
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Product added successfully!')),
         );
@@ -53,11 +100,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error adding product: ${e.message}')),
         );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please select both a category and a flash sale type.')),
+      );
     }
   }
 
@@ -65,11 +121,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Product',style: TextStyle(
-        color: Colors.white,
-            fontFamily: "Urbanist",
-            fontSize: 24
-        )),
+        title: const Text(
+          'Add New Product',
+          style: TextStyle(
+              color: Colors.white, fontFamily: "Urbanist", fontSize: 24),
+        ),
         backgroundColor: MyColors.kPrimaryColor,
       ),
       body: SingleChildScrollView(
@@ -106,13 +162,70 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              // We remove the image picking button since we are not uploading images
+              // Category Dropdown
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: const InputDecoration(labelText: 'Category'),
+                items: _categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                  });
+                },
+                validator: (value) =>
+                value == null ? 'Please select a category.' : null,
+              ),
+              const SizedBox(height: 16),
+              // Flash Sale Dropdown
+              DropdownButtonFormField<String>(
+                value: _selectedFlashSaleType,
+                decoration: const InputDecoration(labelText: 'Flash Sale Type'),
+                items: _flashSaleFilters.map((String type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedFlashSaleType = newValue;
+                  });
+                },
+                validator: (value) => value == null
+                    ? 'Please select a flash sale type.'
+                    : null,
+              ),
+              const SizedBox(height: 24),
+              _pickedImage != null
+                  ? Image.file(
+                File(_pickedImage!.path),
+                height: 150,
+                width: 150,
+                fit: BoxFit.cover,
+              )
+                  : const Text('No image selected.'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _pickImage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: MyColors.kPrimaryColor,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text('Pick Image'),
+              ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _isLoading ? null : _addProduct,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyColors.kPrimaryColor,
                   foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)

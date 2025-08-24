@@ -1,3 +1,4 @@
+// dart format width=80
 import 'package:auto_route/annotations.dart';
 import 'package:bazario/user_features/home/screens/widgets/category_list.dart';
 import 'package:bazario/user_features/home/screens/widgets/product_cart.dart';
@@ -19,31 +20,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0; // The index of the selected bottom navigation item
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-
-    // Navigate based on the tapped index
     switch (index) {
       case 0:
-      context.router.push(HomeRoute());
+        context.router.push(HomeRoute());
         break;
       case 1:
         context.router.push(MyCartRoute());
         break;
       case 2:
-      // Navigate to the Wishlist screen
-        context.router.push(WishlistRoute());        break;
+        context.router.push(WishlistRoute());
+        break;
       case 3:
         context.router.push(const ProfileRoute());
         break;
     }
   }
 
-  // Widget for the Banner/Hero section
   Widget _buildBannerSection() {
     return Card(
       elevation: 5,
@@ -72,7 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Widget for Flash Sale Filters
   Widget _buildFlashSaleFilters(BuildContext context) {
     final homeProvider = Provider.of<HomeProvider>(context);
     return SizedBox(
@@ -112,8 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    final products = Provider.of<HomeProvider>(context).products;
+    final homeProvider = Provider.of<HomeProvider>(context);
+    final products = homeProvider.filteredProducts; // Use the filtered list
 
     return Scaffold(
       appBar: AppBar(
@@ -144,41 +143,49 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 15),
               _buildFlashSaleFilters(context),
               const SizedBox(height: 25),
-              GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.7,
+              if (products.isEmpty)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else
+                GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    return ProductCard(product: products[index]);
+                  },
                 ),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  return ProductCard(product: products[index]);
-                },
-              ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        // Implementation of Bottom Nav Bar
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Search'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.favorite,),
+              icon: Icon(Icons.shopping_cart), label: 'Search'),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.favorite,
+              ),
               label: 'Whish list'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
-        currentIndex: _selectedIndex, // Set the current index
+        currentIndex: _selectedIndex,
         selectedItemColor: MyColors.kPrimaryColor,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        onTap: _onItemTapped, // Handle tap events
+        onTap: _onItemTapped,
       ),
     );
   }

@@ -1,3 +1,4 @@
+// dart format width=80
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,11 +30,33 @@ class ProductCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                 child: Stack(
                   children: [
-                    Image.asset(
+                    // --- Corrected Code ---
+                    // Use Image.network to load the image from a URL
+                    Image.network(
                       product.imageUrl,
                       fit: BoxFit.cover,
                       width: double.infinity,
+                      // Add a loading builder for a better user experience
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                                : null,
+                            color: Colors.grey[400],
+                          ),
+                        );
+                      },
+                      // Add an error builder to handle failed image loads
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(child: Icon(Icons.error));
+                      },
                     ),
+                    // --- End of Corrected Code ---
                     Positioned(
                       top: 8,
                       right: 8,

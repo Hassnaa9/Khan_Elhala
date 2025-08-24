@@ -1,6 +1,7 @@
 // dart format width=80
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../user_features/home/models/category.dart';
 import '../../user_features/home/models/product.dart';
@@ -14,7 +15,6 @@ class CartItem {
 }
 
 class HomeProvider with ChangeNotifier {
-  // Existing data...
   final List<String> _flashSaleFilters = [
     'All',
     'Newest',
@@ -28,54 +28,53 @@ class HomeProvider with ChangeNotifier {
     Category(name: 'Dress', icon: ImagesUrl.dressIcon),
     Category(name: 'Jacket', icon: ImagesUrl.jacketIcon),
   ];
-  final List<Product> _products = [
-    Product(
-      id: '1',
-      name: 'Black suit',
-      imageUrl: ImagesUrl.prod1Img,
-      price: 83.9,
-      isFavorite: true,
-    ),
-    Product(
-      id: '2',
-      name: 'Beige suit',
-      imageUrl: ImagesUrl.prod2Img,
-      price: 83.9,
-      isFavorite: false,
-    ),
-    Product(
-      id: '3',
-      name: 'Blue suit',
-      imageUrl: ImagesUrl.prod3Img,
-      price: 83.9,
-      isFavorite: false,
-    ),
-    Product(
-      id: '4',
-      name: 'White sweater',
-      imageUrl: ImagesUrl.prod4Img,
-      price: 83.9,
-      isFavorite: false,
-    ),
-    Product(
-      id: '5',
-      name: 'black suit',
-      imageUrl: ImagesUrl.prod5Img,
-      price: 83.9,
-      isFavorite: false,
-    ),
-  ];
 
-  // Cart Management
-  final List<CartItem> _cartItems = [];
+  List<Product> _products = [];
+  int _selectedFilterIndex = 0;
 
   // Getters
   List<String> get flashSaleFilters => _flashSaleFilters;
-  int _selectedFilterIndex = 0;
   int get selectedFilterIndex => _selectedFilterIndex;
-  List<Product> get products => _products;
   List<Category> get categories => _categories;
+  List<Product> get products => _products;
+
+  // Cart Management
+  final List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
+
+  // New Getter: Returns filtered products based on selected filter
+  List<Product> get filteredProducts {
+    final selectedFilter = _flashSaleFilters[_selectedFilterIndex];
+    if (selectedFilter == 'All') {
+      return _products;
+    } else if (selectedFilter == 'Newest') {
+      // Assuming you have a 'createdAt' field in your product model
+      // to sort by newest first.
+      final sortedProducts = List<Product>.from(_products);
+      sortedProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return sortedProducts;
+    } else if (selectedFilter == 'Popular') {
+      // Placeholder for popularity filtering logic
+      return _products;
+    } else {
+      return _products.where((p) => p.flashSaleType == selectedFilter).toList();
+    }
+  }
+
+  HomeProvider() {
+    fetchProducts();
+  }
+
+  Future<void> fetchProducts() async {
+    try {
+      final snapshot =
+      await FirebaseFirestore.instance.collection('products').get();
+      _products = snapshot.docs.map((doc) => Product.fromDocument(doc)).toList();
+      notifyListeners();
+    } catch (e) {
+      print('Error fetching products: $e');
+    }
+  }
 
   void selectFilter(int index) {
     _selectedFilterIndex = index;
@@ -92,9 +91,7 @@ class HomeProvider with ChangeNotifier {
     }
   }
 
-  // Method to add a product to the cart
   void addToCart(Product product) {
-    // Check if the item is already in the cart
     final existingItem = _cartItems
         .firstWhereOrNull((item) => item.product.id == product.id);
 
@@ -107,7 +104,6 @@ class HomeProvider with ChangeNotifier {
   }
 }
 
-// Helper extension to find the first element or return null
 extension _FirstWhereOrNullExtension<E> on Iterable<E> {
   E? firstWhereOrNull(bool Function(E) test) {
     for (var element in this) {
