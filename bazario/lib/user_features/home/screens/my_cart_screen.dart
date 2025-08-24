@@ -10,14 +10,6 @@ import '../../../app/app_router.gr.dart';
 import '../../../data/repositories/home_provider.dart';
 import '../models/product.dart';
 
-// Placeholder model for a cart item
-class CartItem {
-  final Product product;
-  int quantity;
-
-  CartItem({required this.product, this.quantity = 1});
-}
-
 @RoutePage()
 class MyCartScreen extends StatefulWidget {
   const MyCartScreen({super.key});
@@ -44,6 +36,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
               const SizedBox(height: 20),
               // Cart item card
               Card(
+                color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -53,7 +46,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
+                        child: Image.network(
                           item.product.imageUrl,
                           width: 80,
                           height: 80,
@@ -67,8 +60,12 @@ class _MyCartScreenState extends State<MyCartScreen> {
                           Text(item.product.name,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold)),
-                          Text('Size: XL',
-                              style: TextStyle(color: Colors.grey[600])),
+                          if (item.selectedSize != null)
+                            Text('Size: ${item.selectedSize}',
+                                style: TextStyle(color: Colors.grey[600])),
+                          if (item.selectedColor != null)
+                            Text('Color: ${item.selectedColor}',
+                                style: TextStyle(color: Colors.grey[600])),
                           Text('\$${item.product.price.toStringAsFixed(2)}',
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold)),
@@ -76,15 +73,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                       ),
                       const Spacer(),
                       // Quantity control
-                      Row(
-                        children: [
-                          _buildQuantityButton(
-                              Icons.remove, () => _decrementQuantity(item)),
-                          Text(item.quantity.toString()),
-                          _buildQuantityButton(
-                              Icons.add, () => _incrementQuantity(item)),
-                        ],
-                      ),
+
                     ],
                   ),
                 ),
@@ -97,7 +86,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[200],
+                        backgroundColor: Colors.grey,
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -161,7 +150,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
       width: 30,
       height: 30,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: MyColors.secondaryPrimaryColor,
         borderRadius: BorderRadius.circular(10),
       ),
       child: IconButton(
@@ -216,10 +205,11 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
                   confirmDismiss: (direction) async {
-                    _showRemoveFromCartDialog(item as CartItem);
+                    _showRemoveFromCartDialog(item);
                     return false;
                   },
                   child: Card(
+                    color: Colors.white,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
@@ -229,7 +219,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
+                            child: Image.network(
                               item.product.imageUrl,
                               width: 80,
                               height: 80,
@@ -244,9 +234,14 @@ class _MyCartScreenState extends State<MyCartScreen> {
                               Text(item.product.name,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold)),
-                              Text('Size: XL',
-                                  style: TextStyle(
-                                      color: Colors.grey[600])),
+                              if (item.selectedSize != null)
+                                Text('Size: ${item.selectedSize}',
+                                    style: TextStyle(
+                                        color: Colors.grey[600])),
+                              if (item.selectedColor != null)
+                                Text('Color: ${item.selectedColor}',
+                                    style: TextStyle(
+                                        color: Colors.grey[600])),
                               Text(
                                   '\$${item.product.price.toStringAsFixed(2)}',
                                   style: const TextStyle(
@@ -257,12 +252,12 @@ class _MyCartScreenState extends State<MyCartScreen> {
                           Row(
                             children: [
                               _buildQuantityButton(Icons.remove,
-                                      () => _decrementQuantity(item as CartItem)),
+                                      () => _decrementQuantity(item)),
                               const SizedBox(width: 5),
                               Text(item.quantity.toString()),
                               const SizedBox(width: 5),
                               _buildQuantityButton(
-                                  Icons.add, () => _incrementQuantity(item as CartItem)),
+                                  Icons.add, () => _incrementQuantity(item)),
                             ],
                           ),
                         ],
@@ -282,8 +277,8 @@ class _MyCartScreenState extends State<MyCartScreen> {
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: MyColors.kPrimaryColor,
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(30)),
+                borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(30)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -306,10 +301,9 @@ class _MyCartScreenState extends State<MyCartScreen> {
                         child: const Text(
                           'See Coupons',
                           style: TextStyle(
-                            color: Colors.white,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.amber
-                          ),
+                              color: Colors.white,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.amber),
                         ),
                       ),
                     ],

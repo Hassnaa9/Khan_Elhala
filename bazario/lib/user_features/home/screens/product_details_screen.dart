@@ -11,7 +11,6 @@ import '../models/product.dart';
 @RoutePage()
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
-
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
@@ -21,19 +20,24 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   // Dummy data for options
   final List<String> _sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-  final List<Color> _colors = [
-    Colors.brown[200]!,
-    Colors.black,
-    Colors.grey[400]!,
-    Colors.brown[400]!,
-    Colors.orange,
-    Colors.brown,
-  ];
-  int _selectedSizeIndex = 2; // Default to 'L'
-  int _selectedColorIndex = 0;
 
-  // No need for _productImages or PageController
-  // since we are only showing one image.
+  // Color data with names for better tracking
+  final List<Map<String, dynamic>> _colorsData = [
+    {'color': Colors.brown[200]!, 'name': 'Light Brown'},
+    {'color': Colors.black, 'name': 'Black'},
+    {'color': Colors.grey[400]!, 'name': 'Grey'},
+    {'color': Colors.brown[400]!, 'name': 'Medium Brown'},
+    {'color': Colors.orange, 'name': 'Orange'},
+    {'color': Colors.brown, 'name': 'Dark Brown'},
+  ];
+
+  int _selectedSizeIndex = 2; // Default to 'L'
+  int _selectedColorIndex = 0; // Default to first color
+
+  // Getter methods for selected values
+  String get selectedSize => _sizes[_selectedSizeIndex];
+  String get selectedColorName => _colorsData[_selectedColorIndex]['name'];
+  Color get selectedColor => _colorsData[_selectedColorIndex]['color'];
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +51,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         title: const Text('Product Details',
             style: TextStyle(color: Colors.black)),
         centerTitle: true,
+        // The corrected code for the favorite icon
         actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border),
-            onPressed: () {},
+          Consumer<HomeProvider>(
+            builder: (context, homeProvider, child) {
+              final productFromProvider = homeProvider.products
+                  .firstWhere((element) => element.id == widget.product.id);
+              return IconButton(
+                icon: Icon(
+                  productFromProvider.isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color: productFromProvider.isFavorite ? Colors.red : Colors.grey,
+                ),
+                onPressed: () {
+                  homeProvider.toggleFavorite(widget.product.id);
+                },
+              );
+            },
           ),
         ],
       ),
@@ -61,7 +79,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             SizedBox(
               height: MediaQuery.of(context).size.height * .4,
               width: double.infinity,
-              child: Image.asset(
+              child: Image.network(
                 widget.product.imageUrl,
                 fit: BoxFit.fill,
               ),
@@ -82,7 +100,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Female's Style", style: TextStyle(color: Colors.grey)),
+          Text(widget.product.category, style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 10),
           Text(widget.product.name,
               style: Theme.of(context).textTheme.headlineMedium),
@@ -100,8 +118,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           Text('Product Details',
               style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 5),
-          const Text(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          Text(
+            widget.product.description,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: Colors.grey),
@@ -110,7 +128,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                // TODO: Implement "Read more" functionality
+                _showFullDescription(context);
               },
               child: Text('Read more',
                   style: TextStyle(color: MyColors.kPrimaryColor)),
@@ -150,17 +168,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   labelStyle: TextStyle(
                     color: isSelected ? Colors.white : Colors.black,
                   ),
+                  side: BorderSide(
+                    color: isSelected ? MyColors.kPrimaryColor : Colors.grey[300]!,
+                  ),
                 ),
               );
             }),
           ),
           const SizedBox(height: 20),
-          const Text('Select Color: Brown',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Select Color: $selectedColorName',
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Urbanist")),
           const SizedBox(height: 10),
           Wrap(
             spacing: 10.0,
-            children: List.generate(_colors.length, (index) {
+            children: List.generate(_colorsData.length, (index) {
               final isSelected = _selectedColorIndex == index;
               return GestureDetector(
                 onTap: () {
@@ -169,15 +193,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   });
                 },
                 child: Container(
-                  width: 30,
-                  height: 30,
+                  width: 35,
+                  height: 35,
                   decoration: BoxDecoration(
-                    color: _colors[index],
+                    color: _colorsData[index]['color'],
                     shape: BoxShape.circle,
                     border: isSelected
-                        ? Border.all(color: Colors.brown, width: 3)
-                        : null,
+                        ? Border.all(color: MyColors.kPrimaryColor, width: 3)
+                        : Border.all(color: Colors.grey[300]!, width: 1),
                   ),
+                  child: isSelected
+                      ? const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 20,
+                  )
+                      : null,
                 ),
               );
             }),
@@ -190,43 +221,123 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget _buildTotalPriceAndButton() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Total Price', style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 5),
-              Text('\$${widget.product.price.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.headlineSmall),
-            ],
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              // Get the provider
-              final homeProvider =
-              Provider.of<HomeProvider>(context, listen: false);
-
-              // Add the product to the cart
-              homeProvider.addToCart(widget.product);
-
-              // Navigate to the My Cart screen
-              context.router.push(const MyCartRoute());
-            },
-            icon: const Icon(Icons.shopping_bag_outlined),
-            label: const Text('Add to Cart'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: MyColors.kPrimaryColor,
-              foregroundColor: Colors.white,
-              padding:
-              const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)),
+          // Display selected options
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey[200]!),
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Selected Options:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text('Size: $selectedSize',
+                        style: const TextStyle(fontSize: 14)),
+                    const SizedBox(width: 20),
+                    Text('Color: $selectedColorName',
+                        style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Price and Add to Cart button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Total Price', style: TextStyle(color: Colors.grey)),
+                  const SizedBox(height: 5),
+                  Text('\$${widget.product.price.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.headlineSmall),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Get the provider
+                  final homeProvider =
+                  Provider.of<HomeProvider>(context, listen: false);
+
+                  // Add the product to the cart with selected size and color
+                  homeProvider.addToCart(
+                    widget.product,
+                    selectedSize, // Pass selected size
+                    selectedColorName, // Pass selected color name
+                  );
+
+                  // Show confirmation snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${widget.product.name} (Size: $selectedSize, Color: $selectedColorName) added to cart!',
+                      ),
+                      backgroundColor: MyColors.kPrimaryColor,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+
+                  // Navigate to the My Cart screen
+                  context.router.push(const MyCartRoute());
+                },
+                icon: const Icon(Icons.shopping_bag_outlined),
+                label: const Text('Add to Cart'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: MyColors.kPrimaryColor,
+                  foregroundColor: Colors.white,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  // Method to show full description in a dialog
+  void _showFullDescription(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(widget.product.name),
+          content: SingleChildScrollView(
+            child: Text(
+              widget.product.description,
+              style: const TextStyle(fontSize: 16, height: 1.5),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Close',
+                style: TextStyle(color: MyColors.kPrimaryColor),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

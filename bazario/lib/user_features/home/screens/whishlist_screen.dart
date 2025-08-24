@@ -2,10 +2,11 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bazario/user_features/home/screens/widgets/product_cart.dart';
+import 'package:bazario/user_features/home/screens/widgets/product_card.dart';
 import 'package:bazario/utils/constants/colors.dart';
 
 import '../../../data/repositories/home_provider.dart';
+import '../models/product.dart';
 
 @RoutePage()
 class WishlistScreen extends StatelessWidget {
@@ -13,9 +14,8 @@ class WishlistScreen extends StatelessWidget {
 
   // Widget for Wishlist Filters
   Widget _buildWishlistFilters(BuildContext context) {
-    // Assuming your HomeProvider has a list of filters and a selected index
     final homeProvider = Provider.of<HomeProvider>(context);
-    final filters = ['All', 'Jacket', 'Shirt', 'Pant', 'T-Shirt'];
+    final filters = homeProvider.wishlistFilters;
     return SizedBox(
       height: .04 * MediaQuery.of(context).size.height,
       child: ListView.builder(
@@ -23,9 +23,8 @@ class WishlistScreen extends StatelessWidget {
         itemCount: filters.length,
         itemBuilder: (context, index) {
           final filter = filters[index];
-          // Use a state management solution (e.g., Provider) to manage selection
-          // final isSelected = homeProvider.selectedWishlistFilterIndex == index;
-          final isSelected = index == 0; // Placeholder for now
+          final isSelected =
+              homeProvider.selectedWishlistFilterIndex == index;
           return Padding(
             padding: const EdgeInsets.only(right: 10),
             child: ChoiceChip(
@@ -38,7 +37,9 @@ class WishlistScreen extends StatelessWidget {
               ),
               selected: isSelected,
               onSelected: (selected) {
-                // TODO: Implement selection logic for filtering
+                if (selected) {
+                  homeProvider.updateWishlistFilters(index);
+                }
               },
               selectedColor: MyColors.kPrimaryColor,
               labelStyle: TextStyle(
@@ -54,9 +55,19 @@ class WishlistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Assuming HomeProvider has a 'wishlistProducts' getter
-    // that returns a list of favorite products.
-    final products = Provider.of<HomeProvider>(context).products; // Use products as placeholder
+    final products = Provider.of<HomeProvider>(context).wishlistProducts;
+    final homeProvider = Provider.of<HomeProvider>(context);
+    final selectedFilterIndex = homeProvider.selectedWishlistFilterIndex;
+
+    List<Product> filteredProducts;
+    if (selectedFilterIndex == 0) {
+      filteredProducts = products;
+    } else {
+      final selectedCategory = homeProvider.wishlistFilters[selectedFilterIndex];
+      filteredProducts = products
+          .where((product) => product.category == selectedCategory)
+          .toList();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -78,20 +89,25 @@ class WishlistScreen extends StatelessWidget {
               const SizedBox(height: 15),
               _buildWishlistFilters(context),
               const SizedBox(height: 25),
-              GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.7,
+              if (filteredProducts.isEmpty)
+                const Center(
+                  child: Text('Your wishlist is empty.'),
+                )
+              else
+                GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: filteredProducts.length,
+                  itemBuilder: (context, index) {
+                    return ProductCard(product: filteredProducts[index]);
+                  },
                 ),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  return ProductCard(product: products[index]);
-                },
-              ),
             ],
           ),
         ),

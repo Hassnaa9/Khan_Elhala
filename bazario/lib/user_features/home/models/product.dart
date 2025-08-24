@@ -8,7 +8,10 @@ class Product {
   final Timestamp createdAt; // Added this field
   final String category;
   final String flashSaleType; // Changed from bool to String
-  late final bool isFavorite;
+  bool isFavorite;
+  final String description; // Added this field
+  final List<String> sizes; // Added this field
+  final List<String> colors; // Added this field
 
   Product({
     required this.id,
@@ -16,6 +19,9 @@ class Product {
     required this.imageUrl,
     required this.price,
     required this.category,
+    required this.description,
+    required this.sizes,
+    required this.colors,
     required this.createdAt, // And this field in the constructor
     required this.flashSaleType,
     this.isFavorite = false,
@@ -32,6 +38,9 @@ class Product {
       category: data['category'] ?? '',
       flashSaleType: data['flashSaleType'] ?? '',
       createdAt: data['createdAt'] ?? Timestamp.now(),
+      sizes: List<String>.from(data['sizes'] ?? []), // Parse list of sizes
+      colors: List<String>.from(data['colors'] ?? []),
+      description: data['description'] ?? '',
       isFavorite: false, // The isFavorite field won't be in Firestore
     );
   }

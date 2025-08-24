@@ -18,8 +18,10 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
+  final _descriptionController = TextEditingController(); // Added
+  final _sizesController = TextEditingController(); // Added
+  final _colorsController = TextEditingController(); // Added
   bool _isLoading = false;
   XFile? _pickedImage;
   String? _selectedCategory;
@@ -47,6 +49,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _sizesController.dispose();
+    _colorsController.dispose();
     super.dispose();
   }
 
@@ -82,6 +86,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
           throw Exception('Failed to get image URL from Cloudinary.');
         }
 
+        // Convert comma-separated strings to lists
+        final sizesList = _sizesController.text.split(',').map((s) => s.trim()).toList();
+        final colorsList = _colorsController.text.split(',').map((c) => c.trim()).toList();
+
         await FirebaseFirestore.instance.collection('products').add({
           'name': _nameController.text.trim(),
           'description': _descriptionController.text.trim(),
@@ -89,6 +97,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
           'imageUrl': imageUrl,
           'category': _selectedCategory,
           'flashSaleType': _selectedFlashSaleType,
+          'sizes': sizesList, // Added sizes
+          'colors': colorsList, // Added colors
           'createdAt': FieldValue.serverTimestamp(),
         });
 
@@ -112,7 +122,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Please select both a category and a flash sale type.')),
+            content: Text(
+                'Please fill all fields and select category & flash sale type.')),
       );
     }
   }
@@ -142,14 +153,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-                validator: (value) =>
-                value!.isEmpty ? 'Please enter a description.' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
@@ -161,8 +164,31 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter a description.' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _sizesController,
+                decoration: const InputDecoration(
+                    labelText: 'Sizes (e.g., S, M, L, XL)'),
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter sizes.' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _colorsController,
+                decoration: const InputDecoration(
+                    labelText: 'Colors (e.g., black, brown, red)'),
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter colors.' : null,
+              ),
               const SizedBox(height: 24),
-              // Category Dropdown
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: const InputDecoration(labelText: 'Category'),
@@ -181,7 +207,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 value == null ? 'Please select a category.' : null,
               ),
               const SizedBox(height: 16),
-              // Flash Sale Dropdown
               DropdownButtonFormField<String>(
                 value: _selectedFlashSaleType,
                 decoration: const InputDecoration(labelText: 'Flash Sale Type'),

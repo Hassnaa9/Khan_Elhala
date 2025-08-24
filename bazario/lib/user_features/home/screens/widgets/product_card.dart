@@ -60,20 +60,28 @@ class ProductCard extends StatelessWidget {
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: InkWell(
-                        onTap: () {
-                          // Toggle favorite status using the provider
-                          Provider.of<HomeProvider>(context, listen: false).toggleFavorite(product.id);
+                      child: Consumer<HomeProvider>(
+                        builder: (context, homeProvider, child) {
+                          final isFavorite = homeProvider.products
+                              .firstWhere(
+                                  (element) => element.id == product.id)
+                              .isFavorite;
+
+                          return InkWell(
+                            onTap: () {
+                              homeProvider.toggleFavorite(product.id);
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white54,
+                              radius: 15,
+                              child: Icon(
+                                isFavorite ? Icons.star : Icons.star_border,
+                                color: isFavorite ? Colors.yellow : Colors.black,
+                                size: 18,
+                              ),
+                            ),
+                          );
                         },
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white54,
-                          radius: 15,
-                          child: Icon(
-                            product.isFavorite ? Icons.star : Icons.star_border,
-                            color: product.isFavorite ? Colors.yellow : Colors.black,
-                            size: 18,
-                          ),
-                        ),
                       ),
                     ),
                   ],
@@ -91,7 +99,8 @@ class ProductCard extends StatelessWidget {
                   ),
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(color: Colors.brown, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.brown, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

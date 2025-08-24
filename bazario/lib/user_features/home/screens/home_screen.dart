@@ -1,7 +1,7 @@
 // dart format width=80
 import 'package:auto_route/annotations.dart';
 import 'package:bazario/user_features/home/screens/widgets/category_list.dart';
-import 'package:bazario/user_features/home/screens/widgets/product_cart.dart';
+import 'package:bazario/user_features/home/screens/widgets/product_card.dart';
 import 'package:bazario/user_features/home/screens/widgets/search_bar.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:flutter/material.dart';

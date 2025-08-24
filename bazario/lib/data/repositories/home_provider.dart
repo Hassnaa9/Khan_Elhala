@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:collection/collection.dart';
 import '../../user_features/home/models/category.dart';
 import '../../user_features/home/models/product.dart';
 
@@ -10,8 +10,15 @@ import '../../user_features/home/models/product.dart';
 class CartItem {
   final Product product;
   int quantity;
+  final String? selectedSize;
+  final String? selectedColor;
 
-  CartItem({required this.product, this.quantity = 1});
+  CartItem({
+    required this.product,
+    this.quantity = 1,
+    this.selectedSize,
+    this.selectedColor,
+  });
 }
 
 class HomeProvider with ChangeNotifier {
@@ -28,13 +35,23 @@ class HomeProvider with ChangeNotifier {
     Category(name: 'Dress', icon: ImagesUrl.dressIcon),
     Category(name: 'Jacket', icon: ImagesUrl.jacketIcon),
   ];
+  final List<String> _wishlistFilters = [
+    'All',
+    'Jacket',
+    'Dress',
+    'Pant',
+    'T-Shirt'
+  ];
 
   List<Product> _products = [];
   int _selectedFilterIndex = 0;
+  int _selectedWishlistFilterIndex = 0;
 
   // Getters
   List<String> get flashSaleFilters => _flashSaleFilters;
+  List<String> get wishlistFilters => _wishlistFilters;
   int get selectedFilterIndex => _selectedFilterIndex;
+  int get selectedWishlistFilterIndex => _selectedWishlistFilterIndex;
   List<Category> get categories => _categories;
   List<Product> get products => _products;
 
@@ -42,23 +59,23 @@ class HomeProvider with ChangeNotifier {
   final List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
 
-  // New Getter: Returns filtered products based on selected filter
   List<Product> get filteredProducts {
     final selectedFilter = _flashSaleFilters[_selectedFilterIndex];
     if (selectedFilter == 'All') {
       return _products;
     } else if (selectedFilter == 'Newest') {
-      // Assuming you have a 'createdAt' field in your product model
-      // to sort by newest first.
       final sortedProducts = List<Product>.from(_products);
       sortedProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return sortedProducts;
     } else if (selectedFilter == 'Popular') {
-      // Placeholder for popularity filtering logic
       return _products;
     } else {
       return _products.where((p) => p.flashSaleType == selectedFilter).toList();
     }
+  }
+
+  List<Product> get wishlistProducts {
+    return _products.where((product) => product.isFavorite).toList();
   }
 
   HomeProvider() {
@@ -69,7 +86,8 @@ class HomeProvider with ChangeNotifier {
     try {
       final snapshot =
       await FirebaseFirestore.instance.collection('products').get();
-      _products = snapshot.docs.map((doc) => Product.fromDocument(doc)).toList();
+      _products =
+          snapshot.docs.map((doc) => Product.fromDocument(doc)).toList();
       notifyListeners();
     } catch (e) {
       print('Error fetching products: $e');
@@ -81,24 +99,35 @@ class HomeProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateWishlistFilters(int index) {
+    _selectedWishlistFilterIndex = index;
+    notifyListeners();
+  }
+
   void toggleFavorite(String productId) {
     final productIndex =
     _products.indexWhere((product) => product.id == productId);
     if (productIndex != -1) {
-      _products[productIndex].isFavorite =
-      !_products[productIndex].isFavorite;
+      _products[productIndex].isFavorite = !_products[productIndex].isFavorite;
       notifyListeners();
     }
   }
 
-  void addToCart(Product product) {
-    final existingItem = _cartItems
-        .firstWhereOrNull((item) => item.product.id == product.id);
+  // Modified method to add a product to the cart with size and color
+  void addToCart(Product product, String? selectedSize, String? selectedColor) {
+    final existingItem = IterableExtension(_cartItems).firstWhereOrNull((item) =>
+    item.product.id == product.id &&
+        item.selectedSize == selectedSize &&
+        item.selectedColor == selectedColor);
 
     if (existingItem != null) {
       existingItem.quantity++;
     } else {
-      _cartItems.add(CartItem(product: product));
+      _cartItems.add(CartItem(
+        product: product,
+        selectedSize: selectedSize,
+        selectedColor: selectedColor,
+      ));
     }
     notifyListeners();
   }
