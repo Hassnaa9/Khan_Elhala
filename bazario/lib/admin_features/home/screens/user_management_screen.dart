@@ -1,4 +1,5 @@
 // dart format width=80
+import 'package:bazario/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:auto_route/annotations.dart';
@@ -42,8 +43,12 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Users'),
-        backgroundColor: Colors.red,
+        title: const Text('Manage Users',style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Urbanist",
+            fontSize: 24
+        )),
+        backgroundColor: MyColors.kPrimaryColor,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _usersStream,
@@ -58,7 +63,11 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> {
 
           if (snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No users found in the database.'),
+              child: Text('No users found in the database.',style: TextStyle(
+              color: MyColors.kPrimaryColor,
+                  fontFamily: "Urbanist",
+                  fontSize: 24
+              )),
             );
           }
 
@@ -71,17 +80,18 @@ class _UsersManagementScreenState extends State<UsersManagementScreen> {
               final bool isAdmin = userData['isAdmin'] ?? false;
 
               return Card(
+                color: Colors.white,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   title: Text(
                     userData['username'] ?? 'No Name',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold,fontFamily: "Urbanist",fontSize: 16),
                   ),
                   subtitle: Text(userData['email'] ?? 'No Email'),
                   trailing: ElevatedButton(
                     onPressed: () => _toggleAdminStatus(userId, isAdmin),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isAdmin ? Colors.green : Colors.grey,
+                      backgroundColor: isAdmin ? Colors.green : Colors.grey[400],
                     ),
                     child: Text(
                       isAdmin ? 'Is Admin' : 'Make Admin',
