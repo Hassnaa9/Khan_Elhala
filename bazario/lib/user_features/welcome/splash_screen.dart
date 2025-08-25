@@ -6,6 +6,8 @@ import 'package:bazario/app/app_router.gr.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/constants/colors.dart';
+
 @RoutePage()
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -89,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
                       fontFamily: 'Khotam',
                       fontSize: 90,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: MyColors.kPrimaryColor,
                       shadows: [
                         Shadow(
                           blurRadius: _glowAnimation.value,
