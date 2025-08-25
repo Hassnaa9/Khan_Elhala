@@ -15,41 +15,31 @@ class AdminHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard',style: TextStyle(
-          color: Colors.white,
-          fontFamily: "Urbanist",
-          fontSize: 24
-        ),),
+        title: const Text(
+          'Admin Dashboard',
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Urbanist",
+            fontSize: 24,
+          ),
+        ),
         backgroundColor: MyColors.kPrimaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               try {
-                // Call the signOut() method to log the user out
                 await FirebaseAuth.instance.signOut();
-
-                // Navigate the user to the login screen or another appropriate screen
-                // after successful logout.
-                // Replace '/login' with the route name of your login screen.
-                // This is just an example, you might have a different navigation setup.
-                // For instance, you could use a push replacement to prevent the user from
-                // going back to the previous screen.
-                context.router.push(SignInRoute());
-                // Optional: Show a message to the user confirming they have logged out.
-                // You can use a SnackBar for this.
+                context.router.push(const SignInRoute());
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Logged out successfully!'),
                   ),
                 );
               } catch (e) {
-                // Handle any potential errors that might occur during the logout process.
                 print('Error during logout: $e');
-
-                // Optional: Show an error message to the user.
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: Text('Failed to log out'),
                   ),
                 );
@@ -69,7 +59,7 @@ class AdminHomeScreen extends StatelessWidget {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: MyColors.secondaryPrimaryColor,
-                fontFamily: "Urbanist"
+                fontFamily: "Urbanist",
               ),
             ),
             const SizedBox(height: 10),
@@ -86,7 +76,7 @@ class AdminHomeScreen extends StatelessWidget {
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: MyColors.kPrimaryColor,
-                fontFamily: "Urbanist"
+                fontFamily: "Urbanist",
               ),
             ),
             const Divider(),
@@ -104,10 +94,32 @@ class AdminHomeScreen extends StatelessWidget {
               title: 'Manage Products',
               subtitle: 'Edit or delete existing products.',
               onTap: () {
-                context.router.push(ManageProductsRoute());
+                context.router.push(const ManageProductsRoute());
               },
             ),
             const SizedBox(height: 30),
+
+            // --- ADDED SECTION FOR ORDERS MANAGEMENT ---
+            const Text(
+              'Orders Management',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: MyColors.kPrimaryColor,
+                fontFamily: "Urbanist",
+              ),
+            ),
+            const Divider(),
+            AdminCard(
+              icon: Icons.shopping_bag,
+              title: 'Manage Orders',
+              subtitle: 'Track and update the status of customer orders.',
+              onTap: () {
+                context.router.push(const ManageOrdersRoute());
+              },
+            ),
+            const SizedBox(height: 30),
+            // --- END OF ADDED SECTION ---
 
             // Section for User Management
             const Text(
@@ -115,6 +127,8 @@ class AdminHomeScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: MyColors.kPrimaryColor,
+                fontFamily: "Urbanist",
               ),
             ),
             const Divider(),
@@ -131,6 +145,4 @@ class AdminHomeScreen extends StatelessWidget {
       ),
     );
   }
-
-
 }
