@@ -1,4 +1,6 @@
 // dart format width=80
+import 'package:bazario/data/repositories/shipping_provider.dart';
+import 'package:bazario/user_features/checkout&payment/models/shipping_model.dart';
 import 'package:bazario/user_features/home/models/cart_item.dart';
 import 'package:bazario/user_features/home/models/product.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,8 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CartItemAdapter());
   Hive.registerAdapter(ProductAdapter());
+  Hive.registerAdapter(ShippingAddressAdapter());
+  Hive.registerAdapter(ShippingTypeAdapter());
   await Hive.openBox<CartItem>('cartBox');
 
   runApp(const BazarioApp());
@@ -35,6 +39,7 @@ class BazarioApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_)=>ShippingProvider()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
