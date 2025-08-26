@@ -1,17 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive_ce/hive.dart';
 
-class Product {
+part 'product.g.dart';
+
+@HiveType(typeId: 1) // A unique ID for the Product class
+class Product extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String imageUrl;
+
+  @HiveField(3)
   final double price;
-  final Timestamp createdAt; // Added this field
+
+  @HiveField(4)
   final String category;
-  final String flashSaleType; // Changed from bool to String
+
+  @HiveField(5)
+  final String flashSaleType;
+
+  @HiveField(6)
+  final String description;
+
+  @HiveField(7)
+  final List<String> sizes;
+
+  @HiveField(8)
+  final List<String> colors;
+
+  @HiveField(9)
+  final DateTime createdAt; // Changed from Timestamp to DateTime
+
+  // This field is for local UI state and will not be stored in Hive
   bool isFavorite;
-  final String description; // Added this field
-  final List<String> sizes; // Added this field
-  final List<String> colors; // Added this field
 
   Product({
     required this.id,
@@ -22,7 +47,7 @@ class Product {
     required this.description,
     required this.sizes,
     required this.colors,
-    required this.createdAt, // And this field in the constructor
+    required this.createdAt,
     required this.flashSaleType,
     this.isFavorite = false,
   });
@@ -37,11 +62,11 @@ class Product {
       price: (data['price'] ?? 0.0).toDouble(),
       category: data['category'] ?? '',
       flashSaleType: data['flashSaleType'] ?? '',
-      createdAt: data['createdAt'] ?? Timestamp.now(),
-      sizes: List<String>.from(data['sizes'] ?? []), // Parse list of sizes
+      createdAt: (data['createdAt'] as Timestamp).toDate(), // Convert to DateTime
+      sizes: List<String>.from(data['sizes'] ?? []),
       colors: List<String>.from(data['colors'] ?? []),
       description: data['description'] ?? '',
-      isFavorite: false, // The isFavorite field won't be in Firestore
+      isFavorite: false,
     );
   }
 }

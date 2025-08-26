@@ -9,7 +9,7 @@ class LocationSubtitleWidget extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.0),
       child: AutoSizeText(
-        "We need to know your location in order to suggest nearby services.",
+        "We need to know your location in order_list.dart to suggest nearby services.",
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 14,

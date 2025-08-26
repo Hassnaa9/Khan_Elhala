@@ -3,8 +3,9 @@ import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/colors.dart';
-
+import 'package:provider/provider.dart'; // Import Provider
 import '../../../app/app_router.gr.dart';
+import '../../../data/repositories/shipping_provider.dart';
 
 @RoutePage()
 class ShippingTypeScreen extends StatefulWidget {
@@ -16,35 +17,10 @@ class ShippingTypeScreen extends StatefulWidget {
 }
 
 class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
-  // Dummy list of shipping options
-  final List<Map<String, dynamic>> _shippingOptions = [
-    {
-      'name': 'Economy',
-      'icon': Icons.local_shipping_outlined,
-      'date': '25 August 2023',
-    },
-    {
-      'name': 'Regular',
-      'icon': Icons.local_shipping_outlined,
-      'date': '24 August 2023',
-    },
-    {
-      'name': 'Cargo',
-      'icon': Icons.local_shipping_outlined,
-      'date': '22 August 2023',
-    },
-    {
-      'name': 'Friend\'s House',
-      'icon': Icons.location_on_outlined,
-      'date': '2464 Royal Ln. Mesa, New Jersey 45463',
-    },
-  ];
-
-  // Currently selected shipping option index
-  int _selectedOptionIndex = 0;
-
   @override
   Widget build(BuildContext context) {
+    final shippingProvider = Provider.of<ShippingProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -63,8 +39,9 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: _shippingOptions.length,
+                itemCount: shippingProvider.shippingTypes.length,
                 itemBuilder: (context, index) {
+                  final shippingType = shippingProvider.shippingTypes[index];
                   return Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
@@ -72,16 +49,14 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: RadioListTile<int>(
                       value: index,
-                      groupValue: _selectedOptionIndex,
+                      groupValue: shippingProvider.getSelectedShippingTypeIndex(),
                       onChanged: (int? value) {
-                        setState(() {
-                          _selectedOptionIndex = value!;
-                        });
+                        shippingProvider.selectShippingType(shippingType);
                       },
                       title: Row(
                         children: [
                           Icon(
-                            _shippingOptions[index]['icon'],
+                            shippingType.icon,
                             color: MyColors.kPrimaryColor,
                           ),
                           const SizedBox(width: 15),
@@ -89,13 +64,13 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _shippingOptions[index]['name'],
+                                shippingType.name,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                'Estimated Arrival: ${_shippingOptions[index]['date']}',
+                                'Estimated Arrival: ${shippingType.date}',
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                             ],

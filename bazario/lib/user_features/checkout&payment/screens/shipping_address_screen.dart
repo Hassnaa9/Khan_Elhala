@@ -4,6 +4,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:bazario/app/app_router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/colors.dart';
+import 'package:provider/provider.dart';
+
+import '../../../data/repositories/shipping_provider.dart'; // Import Provider
 
 @RoutePage()
 class ShippingAddressScreen extends StatefulWidget {
@@ -15,31 +18,10 @@ class ShippingAddressScreen extends StatefulWidget {
 }
 
 class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
-  // Dummy list of addresses
-  final List<Map<String, String>> _addresses = [
-    {
-      'name': 'Home',
-      'address': '1901 Thornridge Cir.'
-    },
-    {
-      'name': 'Office',
-      'address': '4517 Washington Ave.',
-    },
-    {
-      'name': 'Parent\'s House',
-      'address': '8502 Preston Rd.',
-    },
-    {
-      'name': 'Friend\'s House',
-      'address': '2464 Royal Ln. Mesa',
-    },
-  ];
-
-  // Currently selected address index
-  int _selectedAddressIndex = 0;
-
   @override
   Widget build(BuildContext context) {
+    final shippingProvider = Provider.of<ShippingProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -59,28 +41,27 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
             // List of addresses with radio buttons
             Expanded(
               child: ListView.builder(
-                itemCount: _addresses.length,
+                itemCount: shippingProvider.allAddresses.length,
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
+                  final address = shippingProvider.allAddresses[index];
                   return Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     elevation: 0,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: RadioListTile<int>(
-                      title: Text(_addresses[index]['name']!,
+                      title: Text(address.name,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(
-                        _addresses[index]['address']!,
+                        address.address,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       value: index,
-                      groupValue: _selectedAddressIndex,
+                      groupValue: shippingProvider.getSelectedAddressIndex(),
                       onChanged: (int? value) {
-                        setState(() {
-                          _selectedAddressIndex = value!;
-                        });
+                        shippingProvider.selectAddress(address);
                       },
                       activeColor: MyColors.kPrimaryColor,
                       controlAffinity: ListTileControlAffinity.trailing,
@@ -116,7 +97,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-           context.router.push(PaymentMethodsRoute());
+            context.router.push(PaymentMethodsRoute());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: MyColors.kPrimaryColor,

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:provider/provider.dart';
 import 'package:bazario/app/app_router.gr.dart';
-import '../../../data/repositories/home_provider.dart';
+import '../../../data/repositories/home_provider.dart' hide CartItem;
+import '../../../data/services/cart_service.dart';
 import '../../../utils/constants/colors.dart';
 import '../models/product.dart';
+import '../models/cart_item.dart';
 
 @RoutePage()
 class ProductDetailsScreen extends StatefulWidget {
@@ -18,6 +20,9 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  // Use the singleton instance directly
+  final CartService _cartService = CartService();
+
   // Dummy data for options
   final List<String> _sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
@@ -271,16 +276,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  // Get the provider
-                  final homeProvider =
-                  Provider.of<HomeProvider>(context, listen: false);
-
-                  // Add the product to the cart with selected size and color
-                  homeProvider.addToCart(
-                    widget.product,
-                    selectedSize, // Pass selected size
-                    selectedColorName, // Pass selected color name
+                  // Create a new CartItem instance with the selected options
+                  final newCartItem = CartItem(
+                    product: widget.product,
+                    quantity: 1,
+                    selectedSize: selectedSize,
+                    selectedColor: selectedColorName,
                   );
+
+                  // Use the CartService to add the item to the Hive database
+                  _cartService.addItemToCart(newCartItem);
 
                   // Show confirmation snackbar
                   ScaffoldMessenger.of(context).showSnackBar(
