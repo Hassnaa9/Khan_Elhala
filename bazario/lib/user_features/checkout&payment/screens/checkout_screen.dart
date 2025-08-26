@@ -5,10 +5,8 @@ import 'package:bazario/user_features/checkout&payment/screens/widgets/order_lis
 import 'package:bazario/user_features/checkout&payment/screens/widgets/selection_title.dart';
 import 'package:bazario/user_features/checkout&payment/screens/widgets/shipping_type.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import '../../../app/app_router.gr.dart';
-import '../../../data/repositories/shipping_provider.dart';
 
 @RoutePage()
 class CheckoutScreen extends StatelessWidget {
