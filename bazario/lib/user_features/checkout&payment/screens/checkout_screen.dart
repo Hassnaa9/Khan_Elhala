@@ -26,7 +26,7 @@ class CheckoutScreen extends StatelessWidget {
         ),
         title: const Text(
           'Checkout',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: MyColors.kPrimaryColor),
         ),
         centerTitle: true,
       ),
@@ -178,7 +178,7 @@ class CheckoutScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
+                  child: Image.network(
                     item.product.imageUrl,
                     width: 80,
                     height: 80,

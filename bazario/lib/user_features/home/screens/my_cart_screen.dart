@@ -180,7 +180,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.router.pop(),
         ),
-        title: const Text('My Cart'),
+        title: const Text('My Cart',style: TextStyle(color: MyColors.kPrimaryColor),),
         centerTitle: true,
       ),
       body: Column(
