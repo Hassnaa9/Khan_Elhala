@@ -660,20 +660,6 @@
             </list>
           </value>
         </entry>
-        <entry key="isar">
-          <value>
-            <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/isar-3.1.0+1/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="isar_flutter_libs">
-          <value>
-            <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/isar_flutter_libs-3.1.0+1/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="isolate_channel">
           <value>
             <list>
@@ -1355,8 +1341,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/image_picker_windows-0.2.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/intl-0.20.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/io-1.0.5/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/isar-3.1.0+1/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/isar_flutter_libs-3.1.0+1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/isolate_channel-0.2.2+1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/js-0.6.7/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/json_annotation-4.9.0/lib" />

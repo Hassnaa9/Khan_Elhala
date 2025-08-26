@@ -3,23 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/image_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import '../../user_features/home/models/cart_item.dart';
 import '../../user_features/home/models/category.dart';
 import '../../user_features/home/models/product.dart';
 
 // Placeholder model for a cart item
-class CartItem {
-  final Product product;
-  int quantity;
-  final String? selectedSize;
-  final String? selectedColor;
-
-  CartItem({
-    required this.product,
-    this.quantity = 1,
-    this.selectedSize,
-    this.selectedColor,
-  });
-}
 
 class HomeProvider with ChangeNotifier {
   final List<String> _flashSaleFilters = [

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import '../../../app/app_router.gr.dart';
 import '../../../data/repositories/home_provider.dart';
+import '../../home/models/cart_item.dart';
 
 @RoutePage()
 class CheckoutScreen extends StatelessWidget {
