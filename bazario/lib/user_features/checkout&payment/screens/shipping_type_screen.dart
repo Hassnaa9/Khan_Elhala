@@ -1,5 +1,4 @@
 // dart format width=80
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/colors.dart';
@@ -30,7 +29,7 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
           onPressed: () => context.router.pop(),
         ),
         title: const Text('Choose Shipping',
-            style: TextStyle(color: Colors.black)),
+            style: TextStyle(color: MyColors.kPrimaryColor)),
         centerTitle: true,
       ),
       body: Padding(
@@ -43,6 +42,7 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
                 itemBuilder: (context, index) {
                   final shippingType = shippingProvider.shippingTypes[index];
                   return Card(
+                    color: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     elevation: 2,
@@ -60,20 +60,22 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
                             color: MyColors.kPrimaryColor,
                           ),
                           const SizedBox(width: 15),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                shippingType.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'Estimated Arrival: ${shippingType.date}',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  shippingType.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Estimated Arrival: ${shippingType.date}',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -91,7 +93,7 @@ class _ShippingTypeScreenState extends State<ShippingTypeScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-            context.router.push(PaymentMethodsRoute());
+            context.router.push(CheckoutRoute());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: MyColors.kPrimaryColor,

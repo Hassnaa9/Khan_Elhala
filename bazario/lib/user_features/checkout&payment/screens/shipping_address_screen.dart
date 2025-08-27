@@ -1,12 +1,11 @@
 // dart format width=80
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:bazario/app/app_router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/colors.dart';
 import 'package:provider/provider.dart';
-
-import '../../../data/repositories/shipping_provider.dart'; // Import Provider
+import '../../../../user_features/checkout&payment/models/shipping_model.dart';
+import '../../../data/repositories/shipping_provider.dart';
 
 @RoutePage()
 class ShippingAddressScreen extends StatefulWidget {
@@ -18,6 +17,91 @@ class ShippingAddressScreen extends StatefulWidget {
 }
 
 class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
+  // Add a GlobalKey for the form to manage its state
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
+  // Dialog to add a new address
+  Future<void> _showAddAddressDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to close
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Add New Address'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: ListBody(
+                children: <Widget>[
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(hintText: "Name"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a name';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _addressController,
+                    decoration: const InputDecoration(hintText: "Address"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter an address';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _nameController.clear();
+                _addressController.clear();
+              },
+            ),
+            TextButton(
+              child: const Text('Add'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  final newAddress = ShippingAddress(
+                    name: _nameController.text,
+                    address: _addressController.text,
+                  );
+
+                  // Use a provider to add the new address
+                  Provider.of<ShippingProvider>(
+                    context,
+                    listen: false,
+                  ).addCustomAddress(newAddress);
+
+                  Navigator.of(dialogContext).pop();
+                  _nameController.clear();
+                  _addressController.clear();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final shippingProvider = Provider.of<ShippingProvider>(context);
@@ -46,6 +130,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                 itemBuilder: (context, index) {
                   final address = shippingProvider.allAddresses[index];
                   return Card(
+                    color: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     elevation: 0,
@@ -82,9 +167,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: TextButton.icon(
-                onPressed: () {
-                  // TODO: Implement logic to add new shipping address
-                },
+                onPressed: _showAddAddressDialog,
                 icon: const Icon(Icons.add, color: Colors.brown),
                 label: const Text('Add New Shipping Address',
                     style: TextStyle(color: Colors.brown)),
@@ -97,7 +180,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-            context.router.push(PaymentMethodsRoute());
+            context.router.push(const CheckoutRoute());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: MyColors.kPrimaryColor,

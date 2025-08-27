@@ -40,223 +40,104 @@ class ShippingProvider extends ChangeNotifier {
     ),
   ];
 
+  // Currently selected address and shipping type
+  late ShippingAddress _selectedAddress;
+  late ShippingType _selectedShippingType;
+
+  // A list to hold custom addresses added by the user
   List<ShippingAddress> _customAddresses = [];
-  ShippingAddress? _selectedAddress;
-  ShippingType? _selectedShippingType;
 
   // Getters
-  List<ShippingAddress> get allAddresses => [..._defaultAddresses, ..._customAddresses];
+  List<ShippingAddress> get defaultAddresses => _defaultAddresses;
   List<ShippingType> get shippingTypes => _defaultShippingTypes;
   ShippingAddress? get selectedAddress => _selectedAddress;
   ShippingType? get selectedShippingType => _selectedShippingType;
-  bool get isInitialized => _isInitialized;
   List<ShippingAddress> get customAddresses => _customAddresses;
+
+  List<ShippingAddress> get allAddresses => [
+    ..._defaultAddresses,
+    ..._customAddresses,
+  ];
+
+  int getSelectedAddressIndex() {
+    return allAddresses.indexOf(_selectedAddress);
+  }
+
+  int getSelectedShippingTypeIndex() {
+    return shippingTypes.indexOf(_selectedShippingType);
+  }
 
   ShippingProvider() {
     _initializeHive();
   }
 
-  // Initialize Hive and load saved data
+  // Hive initialization
   Future<void> _initializeHive() async {
+    if (_isInitialized) return;
+
     try {
-      // Open the box
       _shippingBox = await Hive.openBox(_shippingBoxName);
 
-      // Load saved data
-      await _loadSavedData();
-
-      _isInitialized = true;
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error initializing ShippingProvider: $e');
-      // Set defaults if initialization fails
-      _selectedAddress = _defaultAddresses.first;
-      _selectedShippingType = _defaultShippingTypes.first;
-      _isInitialized = true;
-      notifyListeners();
-    }
-  }
-
-  // Load saved data from Hive
-  Future<void> _loadSavedData() async {
-    try {
-      // Load selected address
+      // Load selected address from Hive or use default
       final savedAddress = _shippingBox.get(_selectedAddressKey);
-      if (savedAddress is ShippingAddress) {
+      if (savedAddress != null) {
         _selectedAddress = savedAddress;
       } else {
-        // Set default to first address if none selected
         _selectedAddress = _defaultAddresses.first;
       }
 
-      // Load selected shipping type
+      // Load selected shipping type from Hive or use default
       final savedShippingType = _shippingBox.get(_selectedShippingTypeKey);
-      if (savedShippingType is ShippingType) {
+      if (savedShippingType != null) {
         _selectedShippingType = savedShippingType;
       } else {
-        // Set default to first shipping type if none selected
         _selectedShippingType = _defaultShippingTypes.first;
       }
 
-      // Load custom addresses
+      // Load custom addresses from Hive or use default
       final savedCustomAddresses = _shippingBox.get(_customAddressesKey);
-      if (savedCustomAddresses is List) {
-        _customAddresses = savedCustomAddresses.cast<ShippingAddress>();
+      if (savedCustomAddresses != null) {
+        _customAddresses = List.from(savedCustomAddresses);
+      } else {
+        _customAddresses = [];
       }
+
+      _isInitialized = true;
+      notifyListeners();
     } catch (e) {
-      debugPrint('Error loading saved data: $e');
-      // Set defaults if loading fails
+      debugPrint('Error initializing Hive: $e');
+      // Fallback to defaults if Hive fails
       _selectedAddress = _defaultAddresses.first;
       _selectedShippingType = _defaultShippingTypes.first;
       _customAddresses = [];
+      _isInitialized = true;
+      notifyListeners();
     }
   }
 
-  // Save selected address
+  // Select a new shipping address
   Future<void> selectAddress(ShippingAddress address) async {
     _selectedAddress = address;
-    try {
-      await _shippingBox.put(_selectedAddressKey, address);
-    } catch (e) {
-      debugPrint('Error saving selected address: $e');
-    }
+    await _shippingBox.put(_selectedAddressKey, address);
     notifyListeners();
   }
 
-  // Save selected shipping type
-  Future<void> selectShippingType(ShippingType shippingType) async {
-    _selectedShippingType = shippingType;
-    try {
-      await _shippingBox.put(_selectedShippingTypeKey, shippingType);
-    } catch (e) {
-      debugPrint('Error saving selected shipping type: $e');
-    }
-    notifyListeners();
-  }
-
-  // Add custom address
-  Future<void> addCustomAddress(String name, String address) async {
-    final newAddress = ShippingAddress(name: name, address: address);
-    _customAddresses.add(newAddress);
-
-    try {
+  // Add a new custom address and save to Hive
+  Future<void> addCustomAddress(ShippingAddress address) async {
+    if (!_customAddresses.contains(address)) {
+      _customAddresses.add(address);
       await _shippingBox.put(_customAddressesKey, _customAddresses);
-    } catch (e) {
-      debugPrint('Error saving custom addresses: $e');
-      // Rollback on error
-      _customAddresses.remove(newAddress);
+      notifyListeners();
     }
+  }
 
+  // Select a new shipping type
+  Future<void> selectShippingType(ShippingType type) async {
+    _selectedShippingType = type;
+    await _shippingBox.put(_selectedShippingTypeKey, type);
     notifyListeners();
   }
 
-  // Remove custom address
-  Future<void> removeCustomAddress(ShippingAddress address) async {
-    final removedAddress = address;
-    _customAddresses.remove(address);
-
-    try {
-      await _shippingBox.put(_customAddressesKey, _customAddresses);
-
-      // If the removed address was selected, select the first default address
-      if (_selectedAddress == removedAddress) {
-        await selectAddress(_defaultAddresses.first);
-      }
-    } catch (e) {
-      debugPrint('Error removing custom address: $e');
-      // Rollback on error
-      _customAddresses.add(removedAddress);
-    }
-
-    notifyListeners();
-  }
-
-  // Get index of selected address in all addresses list
-  int getSelectedAddressIndex() {
-    if (_selectedAddress == null) return 0;
-    return allAddresses.indexWhere((address) =>
-    address.name == _selectedAddress!.name &&
-        address.address == _selectedAddress!.address);
-  }
-
-  // Get index of selected shipping type
-  int getSelectedShippingTypeIndex() {
-    if (_selectedShippingType == null) return 0;
-    return _defaultShippingTypes.indexWhere((type) =>
-    type.name == _selectedShippingType!.name);
-  }
-
-  // Firebase sync methods (for cloud backup)
-
-  // Upload current selections to Firebase
-  Future<void> syncToFirebase(String userId) async {
-    try {
-      // Example Firebase sync - uncomment and modify as needed
-      /*
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .set({
-            'shipping_preferences': {
-              'selected_address': _selectedAddress?.toMap(),
-              'selected_shipping_type': _selectedShippingType?.toMap(),
-              'custom_addresses': _customAddresses.map((addr) => addr.toMap()).toList(),
-              'last_updated': FieldValue.serverTimestamp(),
-            }
-          }, SetOptions(merge: true));
-      */
-
-      debugPrint('Shipping preferences synced to Firebase');
-    } catch (e) {
-      debugPrint('Error syncing to Firebase: $e');
-    }
-  }
-
-  // Download selections from Firebase
-  Future<void> syncFromFirebase(String userId) async {
-    try {
-      // Example Firebase sync - uncomment and modify as needed
-      /*
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (doc.exists && doc.data() != null) {
-        final preferences = doc.data()!['shipping_preferences'] as Map<String, dynamic>?;
-
-        if (preferences != null) {
-          // Update selected address
-          if (preferences['selected_address'] != null) {
-            final addressData = preferences['selected_address'] as Map<String, dynamic>;
-            await selectAddress(ShippingAddress.fromMap(addressData));
-          }
-
-          // Update selected shipping type
-          if (preferences['selected_shipping_type'] != null) {
-            final shippingTypeData = preferences['selected_shipping_type'] as Map<String, dynamic>;
-            await selectShippingType(ShippingType.fromMap(shippingTypeData));
-          }
-
-          // Update custom addresses
-          if (preferences['custom_addresses'] != null) {
-            final customAddressList = preferences['custom_addresses'] as List;
-            _customAddresses = customAddressList
-                .map((addr) => ShippingAddress.fromMap(addr as Map<String, dynamic>))
-                .toList();
-            await _shippingBox.put(_customAddressesKey, _customAddresses);
-          }
-
-          notifyListeners();
-        }
-      }
-      */
-
-      debugPrint('Shipping preferences synced from Firebase');
-    } catch (e) {
-      debugPrint('Error syncing from Firebase: $e');
-    }
-  }
 
   // Clear all data (useful for logout)
   Future<void> clearAllData() async {

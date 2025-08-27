@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../app/app_router.gr.dart';
 import '../../../../data/repositories/shipping_provider.dart';
 import 'package:provider/provider.dart'; // Import Provider
@@ -12,6 +11,7 @@ class ShippingType extends StatelessWidget {
   Widget build(BuildContext context) {
     final shippingProvider = Provider.of<ShippingProvider>(context);
       return Card(
+        color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 2,
         child: Padding(
