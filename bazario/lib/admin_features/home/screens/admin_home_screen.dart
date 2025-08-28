@@ -115,11 +115,10 @@ class AdminHomeScreen extends StatelessWidget {
               title: 'Manage Orders',
               subtitle: 'Track and update the status of customer orders.',
               onTap: () {
-                context.router.push(const ManageOrdersRoute());
+                context.router.push(AdminOrders());
               },
             ),
             const SizedBox(height: 30),
-            // --- END OF ADDED SECTION ---
 
             // Section for User Management
             const Text(

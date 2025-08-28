@@ -2,6 +2,11 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:bazario/utils/constants/colors.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:auto_route/auto_route.dart';
+
+import '../../../data/repositories/payment_provider.dart';
 
 @RoutePage()
 class AddCardScreen extends StatefulWidget {
@@ -13,6 +18,47 @@ class AddCardScreen extends StatefulWidget {
 
 class _AddCardScreenState extends State<AddCardScreen> {
   bool _saveCard = false;
+
+  // Controllers to get the text from the input fields
+  final TextEditingController _cardHolderNameController = TextEditingController();
+  final TextEditingController _cardNumberController = TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  final TextEditingController _cvvController = TextEditingController();
+
+  // Dispose of controllers when the state is removed to prevent memory leaks
+  @override
+  void dispose() {
+    _cardHolderNameController.dispose();
+    _cardNumberController.dispose();
+    _expiryDateController.dispose();
+    _cvvController.dispose();
+    super.dispose();
+  }
+
+  /// This function handles the card saving logic.
+  void _addCard() {
+    // Get the PaymentProvider instance
+    final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+
+    // Collect the data from the text fields
+    final cardData = {
+      'cardHolderName': _cardHolderNameController.text,
+      'cardNumber': _cardNumberController.text,
+      'expiryDate': _expiryDateController.text,
+      'cvv': _cvvController.text,
+    };
+
+    // Call the saveCard method in the provider
+    paymentProvider.saveCard(cardData);
+
+    // Optionally show a confirmation message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Card added successfully!')),
+    );
+
+    // Navigate back to the previous screen
+    context.router.pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,23 +88,39 @@ class _AddCardScreenState extends State<AddCardScreen> {
               _buildCreditCard(),
               const SizedBox(height: 30),
 
-              // Card Holder Name Input
-              _buildTextInput('Card Holder Name', 'Esther Howard'),
+              // Card Holder Name Input, now with a controller
+              _buildTextInput(
+                'Card Holder Name',
+                'Esther Howard',
+                _cardHolderNameController,
+              ),
 
-              // Card Number Input
+              // Card Number Input, now with a controller
               const SizedBox(height: 20),
-              _buildTextInput('Card Number', '4716 9627 1635 8047'),
+              _buildTextInput(
+                'Card Number',
+                '4716 9627 1635 8047',
+                _cardNumberController,
+              ),
 
-              // Expiry Date and CVV Input
+              // Expiry Date and CVV Input, now with controllers
               const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextInput('Expiry Date', '02/30'),
+                    child: _buildTextInput(
+                      'Expiry Date',
+                      '02/30',
+                      _expiryDateController,
+                    ),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
-                    child: _buildTextInput('CVV', '000'),
+                    child: _buildTextInput(
+                      'CVV',
+                      '000',
+                      _cvvController,
+                    ),
                   ),
                 ],
               ),
@@ -88,9 +150,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: () {
-            // TODO: Implement logic to save the card
-          },
+          onPressed: _addCard, // Call the new _addCard function
           style: ElevatedButton.styleFrom(
             backgroundColor: MyColors.kPrimaryColor,
             foregroundColor: Colors.white,
@@ -208,7 +268,9 @@ class _AddCardScreenState extends State<AddCardScreen> {
     );
   }
 
-  Widget _buildTextInput(String label, String hintText) {
+  // Update the helper method to accept a controller
+  Widget _buildTextInput(String label, String hintText,
+      TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -218,6 +280,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
         ),
         const SizedBox(height: 10),
         TextField(
+          controller: controller, // Assign the controller here
           decoration: InputDecoration(
             hintText: hintText,
             border: OutlineInputBorder(
@@ -226,8 +289,8 @@ class _AddCardScreenState extends State<AddCardScreen> {
             ),
             filled: true,
             fillColor: Colors.grey[200],
-            contentPadding: const EdgeInsets.symmetric(
-                vertical: 18, horizontal: 15),
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
           ),
         ),
       ],

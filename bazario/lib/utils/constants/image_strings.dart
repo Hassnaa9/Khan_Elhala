@@ -22,4 +22,5 @@ class ImagesUrl {
   static const String paypal = "assets/images/paypal_logo.jpeg";
   static const String applePay = "assets/images/apple_pay.jpeg";
   static const String googlePay = "assets/images/google_pay.jpeg";
+  static const String cash = "assets/icons/cash.jpeg";
 }

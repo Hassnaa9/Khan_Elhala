@@ -2,9 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:provider/provider.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-
 import 'package:bazario/utils/constants/colors.dart';
 import '../../../data/services/cart_service.dart';
 import '../models/cart_item.dart';

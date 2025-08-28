@@ -14,8 +14,7 @@ import 'package:bazario/admin_features/home/screens/add_product_screen.dart'
     as _i2;
 import 'package:bazario/admin_features/home/screens/admin_home_screen.dart'
     as _i3;
-import 'package:bazario/admin_features/home/screens/manage_orders_screen.dart'
-    as _i10;
+import 'package:bazario/admin_features/home/screens/admin_orders.dart' as _i4;
 import 'package:bazario/admin_features/home/screens/manage_products_screen.dart'
     as _i11;
 import 'package:bazario/admin_features/home/screens/user_management_screen.dart'
@@ -26,12 +25,12 @@ import 'package:bazario/user_features/authentication/screens/signIn_screen.dart'
     as _i21;
 import 'package:bazario/user_features/authentication/screens/signUp_screen.dart'
     as _i22;
-import 'package:bazario/user_features/checkout&payment/screens/add_cart_screen.dart'
+import 'package:bazario/user_features/checkout&payment/screens/add_card_screen.dart'
     as _i1;
 import 'package:bazario/user_features/checkout&payment/screens/checkout_screen.dart'
-    as _i4;
+    as _i5;
 import 'package:bazario/user_features/checkout&payment/screens/coupon_screen.dart'
-    as _i6;
+    as _i7;
 import 'package:bazario/user_features/checkout&payment/screens/payment_methods_screen.dart'
     as _i15;
 import 'package:bazario/user_features/checkout&payment/screens/payment_successful_screen.dart'
@@ -41,22 +40,22 @@ import 'package:bazario/user_features/checkout&payment/screens/shipping_address_
 import 'package:bazario/user_features/checkout&payment/screens/shipping_type_screen.dart'
     as _i20;
 import 'package:bazario/user_features/home/models/product.dart' as _i31;
-import 'package:bazario/user_features/home/screens/home_screen.dart' as _i7;
+import 'package:bazario/user_features/home/screens/home_screen.dart' as _i8;
 import 'package:bazario/user_features/home/screens/my_cart_screen.dart' as _i12;
 import 'package:bazario/user_features/home/screens/product_details_screen.dart'
     as _i17;
 import 'package:bazario/user_features/home/screens/whishlist_screen.dart'
     as _i28;
 import 'package:bazario/user_features/location/location_page_view_body.dart'
-    as _i9;
+    as _i10;
 import 'package:bazario/user_features/onboarding/onboarding.dart' as _i14;
 import 'package:bazario/user_features/order/screens/leave_order_review_screen.dart'
-    as _i8;
+    as _i9;
 import 'package:bazario/user_features/order/screens/my_orders.dart' as _i13;
 import 'package:bazario/user_features/order/screens/track_order_screen.dart'
     as _i24;
 import 'package:bazario/user_features/Profile&setting/screens/complete_profile.dart'
-    as _i5;
+    as _i6;
 import 'package:bazario/user_features/Profile&setting/screens/profile_screen.dart'
     as _i18;
 import 'package:bazario/user_features/welcome/splash_screen.dart' as _i23;
@@ -112,7 +111,23 @@ class AdminHomeRoute extends _i29.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i4.CheckoutScreen]
+/// [_i4.AdminOrders]
+class AdminOrders extends _i29.PageRouteInfo<void> {
+  const AdminOrders({List<_i29.PageRouteInfo>? children})
+      : super(AdminOrders.name, initialChildren: children);
+
+  static const String name = 'AdminOrders';
+
+  static _i29.PageInfo page = _i29.PageInfo(
+    name,
+    builder: (data) {
+      return const _i4.AdminOrders();
+    },
+  );
+}
+
+/// generated route for
+/// [_i5.CheckoutScreen]
 class CheckoutRoute extends _i29.PageRouteInfo<void> {
   const CheckoutRoute({List<_i29.PageRouteInfo>? children})
       : super(CheckoutRoute.name, initialChildren: children);
@@ -122,13 +137,13 @@ class CheckoutRoute extends _i29.PageRouteInfo<void> {
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i4.CheckoutScreen();
+      return const _i5.CheckoutScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i5.CompleteProfileScreen]
+/// [_i6.CompleteProfileScreen]
 class CompleteProfileRoute extends _i29.PageRouteInfo<void> {
   const CompleteProfileRoute({List<_i29.PageRouteInfo>? children})
       : super(CompleteProfileRoute.name, initialChildren: children);
@@ -138,13 +153,13 @@ class CompleteProfileRoute extends _i29.PageRouteInfo<void> {
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i5.CompleteProfileScreen();
+      return const _i6.CompleteProfileScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i6.CouponScreen]
+/// [_i7.CouponScreen]
 class CouponRoute extends _i29.PageRouteInfo<void> {
   const CouponRoute({List<_i29.PageRouteInfo>? children})
       : super(CouponRoute.name, initialChildren: children);
@@ -154,13 +169,13 @@ class CouponRoute extends _i29.PageRouteInfo<void> {
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i6.CouponScreen();
+      return const _i7.CouponScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i7.HomeScreen]
+/// [_i8.HomeScreen]
 class HomeRoute extends _i29.PageRouteInfo<void> {
   const HomeRoute({List<_i29.PageRouteInfo>? children})
       : super(HomeRoute.name, initialChildren: children);
@@ -170,13 +185,13 @@ class HomeRoute extends _i29.PageRouteInfo<void> {
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i7.HomeScreen();
+      return const _i8.HomeScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i8.LeaveReviewScreen]
+/// [_i9.LeaveReviewScreen]
 class LeaveReviewRoute extends _i29.PageRouteInfo<void> {
   const LeaveReviewRoute({List<_i29.PageRouteInfo>? children})
       : super(LeaveReviewRoute.name, initialChildren: children);
@@ -186,13 +201,13 @@ class LeaveReviewRoute extends _i29.PageRouteInfo<void> {
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i8.LeaveReviewScreen();
+      return const _i9.LeaveReviewScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i9.LocationPageViewBody]
+/// [_i10.LocationPageViewBody]
 class LocationRouteViewBody extends _i29.PageRouteInfo<void> {
   const LocationRouteViewBody({List<_i29.PageRouteInfo>? children})
       : super(LocationRouteViewBody.name, initialChildren: children);
@@ -202,23 +217,7 @@ class LocationRouteViewBody extends _i29.PageRouteInfo<void> {
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i9.LocationPageViewBody();
-    },
-  );
-}
-
-/// generated route for
-/// [_i10.ManageOrdersScreen]
-class ManageOrdersRoute extends _i29.PageRouteInfo<void> {
-  const ManageOrdersRoute({List<_i29.PageRouteInfo>? children})
-      : super(ManageOrdersRoute.name, initialChildren: children);
-
-  static const String name = 'ManageOrdersRoute';
-
-  static _i29.PageInfo page = _i29.PageInfo(
-    name,
-    builder: (data) {
-      return const _i10.ManageOrdersScreen();
+      return const _i10.LocationPageViewBody();
     },
   );
 }
@@ -305,18 +304,80 @@ class PaymentMethodsRoute extends _i29.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i16.PaymentSuccessfulScreen]
-class PaymentSuccessfulRoute extends _i29.PageRouteInfo<void> {
-  const PaymentSuccessfulRoute({List<_i29.PageRouteInfo>? children})
-      : super(PaymentSuccessfulRoute.name, initialChildren: children);
+class PaymentSuccessfulRoute
+    extends _i29.PageRouteInfo<PaymentSuccessfulRouteArgs> {
+  PaymentSuccessfulRoute({
+    _i30.Key? key,
+    String? orderId,
+    double? amount,
+    String? paymentMethod,
+    List<_i29.PageRouteInfo>? children,
+  }) : super(
+          PaymentSuccessfulRoute.name,
+          args: PaymentSuccessfulRouteArgs(
+            key: key,
+            orderId: orderId,
+            amount: amount,
+            paymentMethod: paymentMethod,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'PaymentSuccessfulRoute';
 
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      return const _i16.PaymentSuccessfulScreen();
+      final args = data.argsAs<PaymentSuccessfulRouteArgs>(
+        orElse: () => const PaymentSuccessfulRouteArgs(),
+      );
+      return _i16.PaymentSuccessfulScreen(
+        key: args.key,
+        orderId: args.orderId,
+        amount: args.amount,
+        paymentMethod: args.paymentMethod,
+      );
     },
   );
+}
+
+class PaymentSuccessfulRouteArgs {
+  const PaymentSuccessfulRouteArgs({
+    this.key,
+    this.orderId,
+    this.amount,
+    this.paymentMethod,
+  });
+
+  final _i30.Key? key;
+
+  final String? orderId;
+
+  final double? amount;
+
+  final String? paymentMethod;
+
+  @override
+  String toString() {
+    return 'PaymentSuccessfulRouteArgs{key: $key, orderId: $orderId, amount: $amount, paymentMethod: $paymentMethod}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PaymentSuccessfulRouteArgs) return false;
+    return key == other.key &&
+        orderId == other.orderId &&
+        amount == other.amount &&
+        paymentMethod == other.paymentMethod;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      orderId.hashCode ^
+      amount.hashCode ^
+      paymentMethod.hashCode;
 }
 
 /// generated route for
